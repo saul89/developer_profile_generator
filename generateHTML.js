@@ -55,13 +55,17 @@ function generateHTML(data) {
       padding: 0;
       margin: 0;
       }
-      html, body, .wrapper {
+      html, body {
       height: 100%;
       }
       .wrapper {
       background-color: ${colors[data.color].wrapperBackground};
       padding-top: 100px;
+      height: 600px;
       }
+      .wrapper2 {
+        height: 908px !important;
+        }
       body {
       background-color: white;
       -webkit-print-color-adjust: exact !important;
@@ -172,8 +176,11 @@ function generateHTML(data) {
       }
 
       @media print {
-       body {
-         zoom: .75;
+        body{
+          zoom: .75;
+        }
+       container {
+         zoom: 1;
        }
       }
     </style>
@@ -223,7 +230,7 @@ function generateHTML(data) {
         </div>
       </div>
     </main>
-    <div class="wrapper"></div>
+    <div class="wrapper wrapper2"></div>
   </body>
 </html>
     `;
