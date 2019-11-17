@@ -40,23 +40,27 @@ function init() {
         data.urlGit = response.data.html_url;
       })
       .then(
-        axios.get(starrepoUrl).then(stars => {
-          data.starrepos = stars.data.length;
-        })
-      )
-      .then(() => {
-        var htmlContent = html.generateHTML(data);
-        writeToFile("index", htmlContent);
-      })
-      .then(() => {
-        var options = { format: "A3", orientation: "portrait" };
-        fs.readFile("./index.html", "utf8", (err, data) => {
-          pdf.create(data, options).toFile("./index.pdf", function(err, res) {
-            if (err) return console.log(err);
-            console.log(res);
-          });
-        });
-      });
+        axios
+          .get(starrepoUrl)
+          .then(stars => {
+            data.starrepos = stars.data.length;
+          })
+          .then(() => {
+            var htmlContent = html.generateHTML(data);
+            writeToFile("index", htmlContent);
+          })
+          .then(() => {
+            var options = { format: "A3", orientation: "portrait" };
+            fs.readFile("./index.html", "utf8", (err, data) => {
+              pdf
+                .create(data, options)
+                .toFile("./index.pdf", function(err, res) {
+                  if (err) return console.log(err);
+                  console.log(res);
+                });
+            });
+          })
+      );
   });
 }
 
