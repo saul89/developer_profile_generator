@@ -50,7 +50,7 @@ function init() {
             writeToFile("index", htmlContent);
           })
           .then(() => {
-            var options = { format: "A3", orientation: "portrait" };
+            var options = { format: "A4", layout: "portrait" };
             fs.readFile("./index.html", "utf8", (err, data) => {
               pdf
                 .create(data, options)
