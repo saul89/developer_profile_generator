@@ -1,8 +1,8 @@
 var inquirer = require("inquirer");
 var axios = require("axios");
 var fs = require("fs");
-var pdf = require("html-pdf");
 var html = require("./generateHTML");
+var puppeteer = require("puppeteer");
 
 const questions = [
   {
@@ -21,47 +21,45 @@ function writeToFile(fileName, data) {
   });
 }
 
-function init() {
-  inquirer.prompt(questions).then(data => {
-    let username = data.githubUsername;
-    let githubUrl = `https://api.github.com/users/${username}`;
-    let starrepoUrl = `https://api.github.com/users/${username}/starred?`;
+async function init() {
+  const userProfile = await inquirer.prompt(questions);
 
-    axios
-      .get(githubUrl)
-      .then(response => {
-        data.name = response.data.name;
-        data.imgUrl = response.data.avatar_url;
-        data.location = response.data.location;
-        data.public_repos = response.data.public_repos;
-        data.followers = response.data.followers;
-        data.following = response.data.following;
-        data.currently = response.data.company;
-        data.urlGit = response.data.html_url;
-      })
-      .then(
-        axios
-          .get(starrepoUrl)
-          .then(stars => {
-            data.starrepos = stars.data.length;
-          })
-          .then(() => {
-            var htmlContent = html.generateHTML(data);
-            writeToFile("index", htmlContent);
-          })
-          .then(() => {
-            var options = { format: "A4", layout: "portrait" };
-            fs.readFile("./index.html", "utf8", (err, data) => {
-              pdf
-                .create(data, options)
-                .toFile("./index.pdf", function(err, res) {
-                  if (err) return console.log(err);
-                  console.log(res);
-                });
-            });
-          })
-      );
+  let username = userProfile.githubUsername;
+  let githubUrl = `https://api.github.com/users/${username}`;
+  let starrepoUrl = `https://api.github.com/users/${username}/starred?`;
+
+  const gitResponse = await axios.get(githubUrl);
+
+  userProfile.name = gitResponse.data.name;
+  userProfile.imgUrl = gitResponse.data.avatar_url;
+  userProfile.location = gitResponse.data.location;
+  userProfile.public_repos = gitResponse.data.public_repos;
+  userProfile.followers = gitResponse.data.followers;
+  userProfile.following = gitResponse.data.following;
+  userProfile.currently = gitResponse.data.company;
+  userProfile.urlGit = gitResponse.data.html_url;
+
+  const gitStarReponse = await axios.get(starrepoUrl);
+
+  userProfile.starrepos = gitStarReponse.data.length;
+
+  const htmlContent = html.generateHTML(userProfile);
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+  await page.setContent(htmlContent);
+  const buffer = await page.pdf({
+    path: `./${userProfile.name}.pdf`,
+    format: "A4",
+    printBackground: true,
+    margin: {
+      left: "0px",
+      top: "0px",
+      right: "0px",
+      bottom: "0px"
+    }
   });
+
+  await browser.close();
 }
 
 init();

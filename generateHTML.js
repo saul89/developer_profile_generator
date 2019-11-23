@@ -64,7 +64,7 @@ function generateHTML(data) {
       height: 600px;
       }
       .wrapper2 {
-        height: 908px !important;
+        height: 418px !important;
         }
       body {
       background-color: white;
