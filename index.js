@@ -1,6 +1,5 @@
 var inquirer = require("inquirer");
 var axios = require("axios");
-var fs = require("fs");
 var html = require("./generateHTML");
 var puppeteer = require("puppeteer");
 
@@ -14,12 +13,6 @@ const questions = [
     message: "What is your favourite color?"
   }
 ];
-
-function writeToFile(fileName, data) {
-  fs.writeFile(`${fileName}.html`, data, err => {
-    if (err) throw err;
-  });
-}
 
 async function init() {
   const userProfile = await inquirer.prompt(questions);
